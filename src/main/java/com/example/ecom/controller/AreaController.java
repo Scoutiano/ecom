@@ -6,6 +6,7 @@ import com.example.ecom.repository.AreaRepository;
 import com.example.ecom.repository.CityRepository;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -20,12 +21,28 @@ public class AreaController {
         this.cityRepository = cityRepository;
     }
 
+    // Get all areas by cities
+    @GetMapping("")
+    public List<City> getAll() {
+        return cityRepository.findAll();
+    }
+
+    // Get an area
+    @GetMapping("/{id}")
+    public Area get(@PathVariable Long id){
+        Optional<Area> optionalArea = areaRepository.findById(id);
+        if(!optionalArea.isPresent()) {
+            throw new NullPointerException("Invalid area id.");
+        }
+        return optionalArea.get();
+    }
+
     // Add an area to a specific city
     @PostMapping("/{id}")
     public Area create(@PathVariable Long id, @RequestBody String areaName){
         Optional<City> optionalCity = cityRepository.findById(id);
         if(!optionalCity.isPresent()) {
-            throw new NullPointerException();
+            throw new NullPointerException("Invalid city id.");
         }
         City city = optionalCity.get();
         Area area = new Area(areaName,city);
@@ -40,12 +57,15 @@ public class AreaController {
         areaRepository.deleteById(id);
     }
 
+    // Update an area
     @PutMapping("/{id}")
-    public void update(@PathVariable Long id, @RequestBody Area area){
+    public Area update(@PathVariable Long id, @RequestBody String areaName){
         Optional<Area> optionalArea = areaRepository.findById(id);
-        if(!optionalArea.isPresent()){
-            throw new NullPointerException();
+        if(!optionalArea.isPresent()) {
+            throw new NullPointerException("Invalid area id.");
         }
-
+        Area area = optionalArea.get();
+        area.setAreaName(areaName);
+        return areaRepository.save(area);
     }
 }
