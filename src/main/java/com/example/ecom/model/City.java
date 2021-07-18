@@ -15,7 +15,7 @@ import java.util.List;
 public class City {
     @Id
     @GeneratedValue
-    private Long Id;
+    private Long id;
     @NonNull
     private String cityName;
 
