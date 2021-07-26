@@ -19,6 +19,8 @@ public class Area {
     private Long id;
     @NonNull
     private String areaName;
+    @NonNull
+    private Boolean active;
 
     // City
     @NonNull

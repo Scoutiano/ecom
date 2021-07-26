@@ -18,6 +18,8 @@ public class City {
     private Long id;
     @NonNull
     private String cityName;
+    @NonNull
+    private Boolean active;
 
     // Area
     @JsonManagedReference
