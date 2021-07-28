@@ -4,7 +4,6 @@ import com.example.ecom.controller.exception.AreaIdNotFoundException;
 import com.example.ecom.controller.exception.BadRequestException;
 import com.example.ecom.controller.exception.CityIdNotFoundException;
 import com.example.ecom.controller.exception.NullIdException;
-import com.example.ecom.model.Area;
 import com.example.ecom.model.City;
 import com.example.ecom.model.Entity;
 import com.example.ecom.repository.AreaRepository;
@@ -77,25 +76,24 @@ public class CityController {
      * {@code PUT /city/:id} update a given city through the provided id.
      *
      * @param id id used to find the city that's going to be updated.
-     * @param city modified City object with null id
+     * @param newCity modified City object with null id
      * @return City object after it has been modified to confirm update.
      * @throws BadRequestException if the given id is null
      * @throws CityIdNotFoundException if a city with the given id has not been found.
      */
     @PutMapping("/{id}")
-    public City update(@PathVariable Long id, @RequestBody City city) throws BadRequestException {
+    public City update(@PathVariable Long id, @RequestBody City newCity) throws BadRequestException {
 
-        nullIdCheck(id,Entity.CITY);
-        cityNullCheck(city);
+        nullIdCheck(id, Entity.CITY);
+        cityNullCheck(newCity);
 
-        // Check if city with given id exists
         Optional<City> optionalCity = cityRepository.findById(id);
-        if(!optionalCity.isPresent()) {
-            throw new CityIdNotFoundException();
-        }
 
-        city.setCreationDate(optionalCity.get().getCreationDate());
-        city.setId(optionalCity.get().getId());
+        if(!optionalCity.isPresent()) {
+            throw new AreaIdNotFoundException();
+        }
+        City city = optionalCity.get();
+        city.setCityName(newCity.getCityName());
 
         return cityRepository.save(city);
     }
