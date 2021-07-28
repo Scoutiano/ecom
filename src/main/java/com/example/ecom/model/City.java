@@ -12,18 +12,19 @@ import java.util.List;
 @Setter
 @Getter
 @RequiredArgsConstructor
-public class City {
+public class City extends Auditable{
     @Id
     @GeneratedValue
     private Long id;
     @NonNull
     private String cityName;
-    @NonNull
-    private Boolean active;
+
+    @Column(columnDefinition = "boolean default true")
+    private Boolean active = true;
 
     // Area
     @JsonManagedReference
-    @OneToMany(mappedBy = "city", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "city", fetch = FetchType.LAZY)
     private List<Area> areas = new ArrayList<>();
     public void addArea(Area area){
         areas.add(area);

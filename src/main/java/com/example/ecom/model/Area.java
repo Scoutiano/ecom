@@ -13,14 +13,14 @@ import javax.persistence.*;
 @Table(uniqueConstraints={
         @UniqueConstraint(name = "unq_city_area", columnNames = {"city_id", "areaName"})
 })
-public class Area {
+public class Area extends Auditable{
     @Id
     @GeneratedValue
     private Long id;
     @NonNull
     private String areaName;
-    @NonNull
-    private Boolean active;
+    @Column(columnDefinition = "boolean default true")
+    private Boolean active = true;
 
     // City
     @NonNull

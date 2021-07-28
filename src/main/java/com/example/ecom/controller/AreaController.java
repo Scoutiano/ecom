@@ -121,11 +121,11 @@ public class AreaController {
     }
 
     /**
-     *{@code PUT /area/:id}
+     *{@code PUT /area/:id} Update an area through its id
      *
      * @param id id used to retrieve an area
      * @param area updated area with new values
-     * @return return Area object to confirm update
+     * @return return updated Area object to confirm update
      * @throws AreaIdNotFoundException when the requested area id is not found
      */
     @PutMapping("/{id}")

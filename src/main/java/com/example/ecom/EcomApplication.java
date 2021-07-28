@@ -37,10 +37,6 @@ public class EcomApplication {
                 areaRepository.save(area1);
                 areaRepository.save(area2);
                 areaRepository.save(area3);
-
-                city.addArea(area1);
-                city.addArea(area2);
-                city.addArea(area3);
             }
         };
     }
