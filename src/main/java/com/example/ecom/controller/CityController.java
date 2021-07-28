@@ -43,6 +43,7 @@ public class CityController {
 
     /**
      * {@code GET /city/:id} Get a specific area with the given id
+     *
      * @param id id used to retrieve the requested city
      * @return return requested City object
      * @throws CityIdNotFoundException when the requested city id is not found
@@ -101,7 +102,7 @@ public class CityController {
     /**
      * {@code DELETE /city/:id} Delete a city by its given id
      *
-     * @param id id of the city to be deleted
+     * @param id id of the city to be deleted (Set active to false)
      */
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id){

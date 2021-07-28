@@ -96,7 +96,7 @@ public class AreaController {
     /**
      * {@code DELETE /area/:id} Delete an area a given id
      *
-     * @param id the area with this given id is to be deleted
+     * @param id the area with this given id is to be deleted (Set active to false)
      * @throws AreaIdNotFoundException when the requested area id is not found
      */
     @DeleteMapping("/{id}")
