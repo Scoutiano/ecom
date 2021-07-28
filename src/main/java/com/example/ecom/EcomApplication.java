@@ -8,7 +8,9 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
+@EnableJpaAuditing
 @SpringBootApplication
 public class EcomApplication {
 
@@ -37,10 +39,6 @@ public class EcomApplication {
                 areaRepository.save(area1);
                 areaRepository.save(area2);
                 areaRepository.save(area3);
-
-                city.addArea(area1);
-                city.addArea(area2);
-                city.addArea(area3);
             }
         };
     }

@@ -17,9 +17,6 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.TypedQuery;
 import java.util.List;
 import java.util.Optional;
 
@@ -121,11 +118,11 @@ public class AreaController {
     }
 
     /**
-     *{@code PUT /area/:id}
+     *{@code PUT /area/:id} Update an area through its id
      *
      * @param id id used to retrieve an area
      * @param area updated area with new values
-     * @return return Area object to confirm update
+     * @return return updated Area object to confirm update
      * @throws AreaIdNotFoundException when the requested area id is not found
      */
     @PutMapping("/{id}")
@@ -143,6 +140,7 @@ public class AreaController {
 
         uniqueCityAreaCheck(area.getAreaName(),city);
 
+        area.setCreationDate(optionalArea.get().getCreationDate());
         area.setCity(city);
         area.setId(id);
 
