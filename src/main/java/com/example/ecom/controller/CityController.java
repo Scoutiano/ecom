@@ -92,6 +92,7 @@ public class CityController {
             throw new CityIdNotFoundException();
         }
 
+        city.setCreationDate(optionalCity.get().getCreationDate());
         city.setId(optionalCity.get().getId());
 
         return cityRepository.save(city);
@@ -135,7 +136,7 @@ public class CityController {
         }
 
         if(city.getCityName() == null) {
-            throw new BadRequestException("City name is null","area","areaName_null");
+            throw new BadRequestException("City name is null","city","cityName_null");
         }
 
         if(city.getActive() == null) {

@@ -17,9 +17,6 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.TypedQuery;
 import java.util.List;
 import java.util.Optional;
 
@@ -143,6 +140,7 @@ public class AreaController {
 
         uniqueCityAreaCheck(area.getAreaName(),city);
 
+        area.setCreationDate(optionalArea.get().getCreationDate());
         area.setCity(city);
         area.setId(id);
 

@@ -12,7 +12,9 @@ import java.util.List;
 @Setter
 @Getter
 @RequiredArgsConstructor
-public class City extends Auditable{
+@EqualsAndHashCode
+@ToString
+public class City extends Auditable<City>{
     @Id
     @GeneratedValue
     private Long id;
