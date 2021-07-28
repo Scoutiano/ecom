@@ -1,10 +1,12 @@
 package com.example.ecom.controller;
 
+import com.example.ecom.controller.exception.AreaIdNotFoundException;
 import com.example.ecom.controller.exception.BadRequestException;
 import com.example.ecom.controller.exception.CityIdNotFoundException;
 import com.example.ecom.controller.exception.NullIdException;
 import com.example.ecom.model.Area;
 import com.example.ecom.model.City;
+import com.example.ecom.model.Entity;
 import com.example.ecom.repository.AreaRepository;
 import com.example.ecom.repository.CityRepository;
 import org.springframework.web.bind.annotation.*;
@@ -49,7 +51,7 @@ public class CityController {
     @GetMapping("/{id}")
     public City get(@PathVariable Long id){
 
-        nullIdCheck(id,"city");
+        nullIdCheck(id,Entity.CITY);
 
         // Check if city with given id exists
         Optional<City> optionalCity = cityRepository.findById(id);
@@ -83,7 +85,7 @@ public class CityController {
     @PutMapping("/{id}")
     public City update(@PathVariable Long id, @RequestBody City city) throws BadRequestException {
 
-        nullIdCheck(id,"city");
+        nullIdCheck(id,Entity.CITY);
         cityNullCheck(city);
 
         // Check if city with given id exists
@@ -106,9 +108,19 @@ public class CityController {
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id){
 
-        nullIdCheck(id,"city");
+        nullIdCheck(id,Entity.CITY);
 
-        cityRepository.deleteById(id);
+        // Check if city with given id exists *REVIEW
+        Optional<City> optionalCity = cityRepository.findById(id);
+
+        if(!optionalCity.isPresent()){
+            throw new CityIdNotFoundException();
+        }
+
+        City city = optionalCity.get();
+        city.setActive(false);
+
+        cityRepository.save(city);
     }
 
     /**
@@ -118,7 +130,7 @@ public class CityController {
      * @param entity entity name to use in exception
      * @throws NullIdException when given id is null
      */
-    public void nullIdCheck(Long id, String entity){
+    public void nullIdCheck(Long id, Entity entity){
         if(id == null) {
             throw new NullIdException(entity);
         }
@@ -132,15 +144,11 @@ public class CityController {
      */
     public void cityNullCheck(City city) {
         if(city == null) {
-            throw new BadRequestException("City is null","city","city_null");
+            throw new BadRequestException("City is null",Entity.CITY,"city_null");
         }
 
         if(city.getCityName() == null) {
-            throw new BadRequestException("City name is null","city","cityName_null");
-        }
-
-        if(city.getActive() == null) {
-            throw new BadRequestException("City is null","city","city_null");
+            throw new BadRequestException("City name is null",Entity.CITY,"cityName_null");
         }
     }
 }

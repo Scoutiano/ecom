@@ -6,15 +6,9 @@ import com.example.ecom.controller.exception.CityIdNotFoundException;
 import com.example.ecom.controller.exception.NullIdException;
 import com.example.ecom.model.Area;
 import com.example.ecom.model.City;
+import com.example.ecom.model.Entity;
 import com.example.ecom.repository.AreaRepository;
 import com.example.ecom.repository.CityRepository;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.boot.Metadata;
-import org.hibernate.boot.MetadataSources;
-import org.hibernate.boot.registry.StandardServiceRegistry;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -59,7 +53,7 @@ public class AreaController {
     @GetMapping("/{id}")
     public Area get(@PathVariable Long id) {
 
-        nullIdCheck(id,"area");
+        nullIdCheck(id,Entity.AREA);
 
         Optional<Area> optionalArea = areaRepository.findById(id);
         if(!optionalArea.isPresent()) {
@@ -79,7 +73,7 @@ public class AreaController {
     @PostMapping("/{id}")
     public Area create(@PathVariable Long id, @RequestBody Area area){
 
-        nullIdCheck(id,"city");
+        nullIdCheck(id,Entity.CITY);
         areaNullCheck(area);
 
         // Check if city with given id exists
@@ -107,43 +101,45 @@ public class AreaController {
      */
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
-        nullIdCheck(id,"area");
+        nullIdCheck(id,Entity.AREA);
 
         // Check if area with given id exists *REVIEW
-        if(!areaRepository.existsById(id)) {
+        Optional<Area> optionalArea = areaRepository.findById(id);
+
+        if(!optionalArea.isPresent()){
             throw new AreaIdNotFoundException();
         }
 
-        areaRepository.deleteById(id);
+        Area area = optionalArea.get();
+        area.setActive(false);
+
+        areaRepository.save(area);
     }
 
     /**
      *{@code PUT /area/:id} Update an area through its id
      *
      * @param id id used to retrieve an area
-     * @param area updated area with new values
+     * @param newArea updated area with new values
      * @return return updated Area object to confirm update
      * @throws AreaIdNotFoundException when the requested area id is not found
      */
     @PutMapping("/{id}")
-    public Area update(@PathVariable Long id, @RequestBody Area area){
+    public Area update(@PathVariable Long id, @RequestBody Area newArea){
 
-        nullIdCheck(id,"area");
-        areaNullCheck(area);
+        nullIdCheck(id, Entity.AREA);
+        areaNullCheck(newArea);
 
-        // Check if area with given id exists
         Optional<Area> optionalArea = areaRepository.findById(id);
+
         if(!optionalArea.isPresent()) {
             throw new AreaIdNotFoundException();
         }
-        City city = optionalArea.get().getCity();
 
-        uniqueCityAreaCheck(area.getAreaName(),city);
+        Area area = optionalArea.get();
 
-        area.setCreationDate(optionalArea.get().getCreationDate());
-        area.setCity(city);
-        area.setId(id);
-
+        area.setAreaName(newArea.getAreaName());
+        area.setCity(newArea.getCity());
         return areaRepository.save(area);
     }
 
@@ -154,7 +150,7 @@ public class AreaController {
      * @param entity entity name to use in exception
      * @throws NullIdException when given id is null
      */
-    public void nullIdCheck(Long id, String entity){
+    public void nullIdCheck(Long id, Entity entity){
         if(id == null) {
             throw new NullIdException(entity);
         }
@@ -168,11 +164,11 @@ public class AreaController {
      */
     public void areaNullCheck(Area area) {
         if(area == null) {
-            throw new BadRequestException("Area is null","Area","area_null");
+            throw new BadRequestException("Area is null",Entity.AREA,"area_null");
         }
 
         if(area.getAreaName() == null) {
-            throw new BadRequestException("Area name is null","Area","areaName_null");
+            throw new BadRequestException("Area name is null",Entity.AREA,"areaName_null");
         }
     }
 
@@ -186,7 +182,7 @@ public class AreaController {
     public void uniqueCityAreaCheck(String areaName, City city){
         int count = areaRepository.findConflictingAreas(areaName,city);
         if(count != 0) {
-            throw new BadRequestException("There already exists an area with the given name within this city","area","area_duplicate");
+            throw new BadRequestException("There already exists an area with the given name within this city",Entity.AREA,"area_duplicate");
         }
     }
 }
