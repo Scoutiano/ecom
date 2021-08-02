@@ -6,6 +6,7 @@ import com.example.ecom.controller.exception.ProductIdNotFoundException;
 import com.example.ecom.model.Entity;
 import com.example.ecom.model.Product;
 import com.example.ecom.repository.ProductRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,16 +16,8 @@ import java.util.Optional;
 @RequestMapping("/product")
 public class ProductController {
 
+    @Autowired
     private ProductRepository productRepository;
-
-    /**
-     * Constructor for ProductController
-     *
-     * @param productRepository used to perform queries related to Product entity
-     */
-    public ProductController(ProductRepository productRepository) {
-        this.productRepository = productRepository;
-    }
 
     @GetMapping
     public List<Product> getAll() {
@@ -104,17 +97,11 @@ public class ProductController {
      */
     @DeleteMapping("{id}")
     public void delete(@PathVariable Long id) {
-
-        Optional<Product> optionalProduct = productRepository.findById(id);
-
-        if(!optionalProduct.isPresent()){
-            throw new ProductIdNotFoundException();
+        // Null check for id
+        if(id == null) {
+            throw new NullIdException(Entity.PRODUCT);
         }
-
-        Product product = optionalProduct.get();
-        product.setActive(false);
-
-        productRepository.save(product);
+        productRepository.deleteById(id);
     }
 
     /**

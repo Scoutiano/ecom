@@ -9,6 +9,7 @@ import com.example.ecom.model.City;
 import com.example.ecom.model.Entity;
 import com.example.ecom.repository.AreaRepository;
 import com.example.ecom.repository.CityRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,20 +19,10 @@ import java.util.Optional;
 @RequestMapping("/area")
 public class AreaController {
 
-
+    @Autowired
     AreaRepository areaRepository;
+    @Autowired
     CityRepository cityRepository;
-
-    /**
-     * Constructor for AreaController class
-     *
-     * @param cityRepository used to perform queries related to City entity
-     * @param areaRepository used to perform queries related to Area entity
-     */
-    public AreaController(AreaRepository areaRepository, CityRepository cityRepository){
-        this.areaRepository = areaRepository;
-        this.cityRepository = cityRepository;
-    }
 
     /**
      * {@code GET /area/} Get all areas information with their cities
@@ -102,18 +93,7 @@ public class AreaController {
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
         nullIdCheck(id,Entity.AREA);
-
-        // Check if area with given id exists *REVIEW
-        Optional<Area> optionalArea = areaRepository.findById(id);
-
-        if(!optionalArea.isPresent()){
-            throw new AreaIdNotFoundException();
-        }
-
-        Area area = optionalArea.get();
-        area.setActive(false);
-
-        areaRepository.save(area);
+        areaRepository.deleteById(id);
     }
 
     /**
@@ -169,6 +149,10 @@ public class AreaController {
 
         if(area.getAreaName() == null) {
             throw new BadRequestException("Area name is null",Entity.AREA,"areaName_null");
+        }
+
+        if(area.getCity() == null) {
+            throw new BadRequestException("Area city is null", Entity.CITY, "areaCity_null");
         }
     }
 

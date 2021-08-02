@@ -8,6 +8,7 @@ import com.example.ecom.model.City;
 import com.example.ecom.model.Entity;
 import com.example.ecom.repository.AreaRepository;
 import com.example.ecom.repository.CityRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,19 +18,11 @@ import java.util.Optional;
 @RequestMapping("/city")
 public class CityController {
 
+    @Autowired
     CityRepository cityRepository;
-    AreaRepository areaRepository;
 
-    /**
-     * Constructor for CityController class
-     *
-     * @param cityRepository used to perform queries related to City entity
-     * @param areaRepository used to perform queries related to Area entity
-     */
-    public CityController(CityRepository cityRepository, AreaRepository areaRepository){
-        this.areaRepository = areaRepository;
-        this.cityRepository = cityRepository;
-    }
+    @Autowired
+    AreaRepository areaRepository;
 
     /**
      * {@code GET /city/} Get a list of all cities
@@ -106,20 +99,8 @@ public class CityController {
      */
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id){
-
         nullIdCheck(id,Entity.CITY);
-
-        // Check if city with given id exists *REVIEW
-        Optional<City> optionalCity = cityRepository.findById(id);
-
-        if(!optionalCity.isPresent()){
-            throw new CityIdNotFoundException();
-        }
-
-        City city = optionalCity.get();
-        city.setActive(false);
-
-        cityRepository.save(city);
+        cityRepository.deleteById(id);
     }
 
     /**
