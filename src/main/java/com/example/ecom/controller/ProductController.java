@@ -54,7 +54,6 @@ public class ProductController {
      */
     @PostMapping()
     public Product create(@RequestBody Product product) {
-        productNullCheck(product);
         return productRepository.save(product);
     }
 
@@ -69,9 +68,6 @@ public class ProductController {
      */
     @PutMapping("{id}")
     public Product update(@PathVariable Long id, @RequestBody Product newProduct) {
-
-        productNullCheck(newProduct);
-
         // Null check for id
         if(id == null) {
             throw new NullIdException(Entity.PRODUCT);
@@ -102,23 +98,5 @@ public class ProductController {
             throw new NullIdException(Entity.PRODUCT);
         }
         productRepository.deleteById(id);
-    }
-
-    /**
-     * Utility method used to check if product or any of its passed variables are null
-     * @param product
-     */
-    public void productNullCheck(Product product) {
-        if(product == null) {
-            throw new BadRequestException("Product is null",Entity.PRODUCT,"product_null");
-        }
-
-        if(product.getProductName() == null) {
-            throw new BadRequestException("Product name is null",Entity.PRODUCT,"productName_null");
-        }
-
-        if(product.getPrice() == null) {
-            throw new BadRequestException("Product price is null",Entity.PRODUCT,"productPrice_null");
-        }
     }
 }

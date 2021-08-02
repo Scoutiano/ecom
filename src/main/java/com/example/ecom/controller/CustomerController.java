@@ -54,7 +54,6 @@ public class CustomerController {
      */
     @PostMapping()
     public Customer create(@RequestBody Customer customer) {
-        customerNullCheck(customer);
         return customerRepository.save(customer);
     }
 
@@ -69,9 +68,6 @@ public class CustomerController {
      */
     @PutMapping("{id}")
     public Customer update(@PathVariable Long id, @RequestBody Customer newCustomer) {
-
-        customerNullCheck(newCustomer);
-
         // Null check for id
         if(id == null) {
             throw new NullIdException(Entity.CUSTOMER);
@@ -104,31 +100,5 @@ public class CustomerController {
             throw new NullIdException(Entity.CUSTOMER);
         }
         customerRepository.deleteById(id);
-    }
-
-    /**
-     * Utility method used to check if product or any of its passed variables are null
-     * @param customer
-     */
-    public void customerNullCheck(Customer customer) {
-        if(customer == null) {
-            throw new BadRequestException("Customer is null", Entity.CUSTOMER,"customer_null");
-        }
-
-        if(customer.getFirstName() == null) {
-            throw new BadRequestException("Customer first name is null",Entity.CUSTOMER,"customerFirstName_null");
-        }
-
-        if(customer.getLastName() == null) {
-            throw new BadRequestException("Customer last name is null",Entity.CUSTOMER,"customerLastName_null");
-        }
-
-        if(customer.getArea() == null) {
-            throw new BadRequestException("Customer area is null",Entity.CUSTOMER,"customerArea_null");
-        }
-
-        if(customer.getDob() == null) {
-            throw new BadRequestException("Customer date of birth is null",Entity.CUSTOMER,"customerDob_null");
-        }
     }
 }

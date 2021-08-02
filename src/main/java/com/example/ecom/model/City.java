@@ -19,14 +19,17 @@ import java.util.List;
 @RequiredArgsConstructor
 @EqualsAndHashCode
 @ToString
-public class City extends Auditable<City>{
+public class City extends Auditable{
     @Id
     @GeneratedValue
     private Long id;
+
     @NonNull
+    @Basic(optional = false)
     private String cityName;
 
-    @Column(columnDefinition = "boolean default true")
+    @NonNull
+    @Basic(optional = false)
     private Boolean active = true;
 
     // Area

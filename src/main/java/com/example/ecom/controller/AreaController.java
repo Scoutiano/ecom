@@ -29,7 +29,7 @@ public class AreaController {
      *
      * @return list of cities containing all areas
      */
-    @GetMapping("")
+    @GetMapping()
     public List<City> getAll() {
         return cityRepository.findAll();
     }
@@ -44,7 +44,10 @@ public class AreaController {
     @GetMapping("/{id}")
     public Area get(@PathVariable Long id) {
 
-        nullIdCheck(id,Entity.AREA);
+        // null check for id
+        if(id == null) {
+            throw new NullIdException(Entity.AREA);
+        }
 
         Optional<Area> optionalArea = areaRepository.findById(id);
         if(!optionalArea.isPresent()) {
@@ -64,8 +67,10 @@ public class AreaController {
     @PostMapping("/{id}")
     public Area create(@PathVariable Long id, @RequestBody Area area){
 
-        nullIdCheck(id,Entity.CITY);
-        areaNullCheck(area);
+        // null check for id
+        if(id == null) {
+            throw new NullIdException(Entity.AREA);
+        }
 
         // Check if city with given id exists
         Optional<City> optionalCity = cityRepository.findById(id);
@@ -92,7 +97,11 @@ public class AreaController {
      */
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
-        nullIdCheck(id,Entity.AREA);
+        // null check for id
+        if(id == null) {
+            throw new NullIdException(Entity.AREA);
+        }
+
         areaRepository.deleteById(id);
     }
 
@@ -107,8 +116,10 @@ public class AreaController {
     @PutMapping("/{id}")
     public Area update(@PathVariable Long id, @RequestBody Area newArea){
 
-        nullIdCheck(id, Entity.AREA);
-        areaNullCheck(newArea);
+        // null check for id
+        if(id == null) {
+            throw new NullIdException(Entity.AREA);
+        }
 
         Optional<Area> optionalArea = areaRepository.findById(id);
 
@@ -121,39 +132,6 @@ public class AreaController {
         area.setAreaName(newArea.getAreaName());
         area.setCity(newArea.getCity());
         return areaRepository.save(area);
-    }
-
-    /**
-     * Utility method to check if given id is null
-     *
-     * @param id given entity id to check
-     * @param entity entity name to use in exception
-     * @throws NullIdException when given id is null
-     */
-    public void nullIdCheck(Long id, Entity entity){
-        if(id == null) {
-            throw new NullIdException(entity);
-        }
-    }
-
-    /**
-     * Utility method used to check if area or any of its passed variables are null
-     *
-     * @param area area to be checked for null variables
-     * @throws BadRequestException if area or area.getAreaName() are null
-     */
-    public void areaNullCheck(Area area) {
-        if(area == null) {
-            throw new BadRequestException("Area is null",Entity.AREA,"area_null");
-        }
-
-        if(area.getAreaName() == null) {
-            throw new BadRequestException("Area name is null",Entity.AREA,"areaName_null");
-        }
-
-        if(area.getCity() == null) {
-            throw new BadRequestException("Area city is null", Entity.CITY, "areaCity_null");
-        }
     }
 
     /**

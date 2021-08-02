@@ -44,7 +44,10 @@ public class CityController {
     @GetMapping("/{id}")
     public City get(@PathVariable Long id){
 
-        nullIdCheck(id,Entity.CITY);
+        // null check for id
+        if(id == null) {
+            throw new NullIdException(Entity.CITY);
+        }
 
         // Check if city with given id exists
         Optional<City> optionalCity = cityRepository.findById(id);
@@ -62,7 +65,6 @@ public class CityController {
      */
     @PostMapping()
     public City create(@RequestBody City city) {
-        cityNullCheck(city);
         return cityRepository.save(city);
     }
 
@@ -78,8 +80,10 @@ public class CityController {
     @PutMapping("/{id}")
     public City update(@PathVariable Long id, @RequestBody City newCity) throws BadRequestException {
 
-        nullIdCheck(id, Entity.CITY);
-        cityNullCheck(newCity);
+        // null check for id
+        if(id == null) {
+            throw new NullIdException(Entity.CITY);
+        }
 
         Optional<City> optionalCity = cityRepository.findById(id);
 
@@ -99,36 +103,11 @@ public class CityController {
      */
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id){
-        nullIdCheck(id,Entity.CITY);
-        cityRepository.deleteById(id);
-    }
-
-    /**
-     * Utility method to check if given id is null
-     *
-     * @param id given entity id to check
-     * @param entity entity name to use in exception
-     * @throws NullIdException when given id is null
-     */
-    public void nullIdCheck(Long id, Entity entity){
+        // null check for id
         if(id == null) {
-            throw new NullIdException(entity);
-        }
-    }
-
-    /**
-     * Utility method used to check if area or any of its passed variables are null
-     *
-     * @param city city to be checked for null variables
-     * @throws BadRequestException if area or area.getAreaName() are null
-     */
-    public void cityNullCheck(City city) {
-        if(city == null) {
-            throw new BadRequestException("City is null",Entity.CITY,"city_null");
+            throw new NullIdException(Entity.CITY);
         }
 
-        if(city.getCityName() == null) {
-            throw new BadRequestException("City name is null",Entity.CITY,"cityName_null");
-        }
+        cityRepository.deleteById(id);
     }
 }
