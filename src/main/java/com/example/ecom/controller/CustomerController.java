@@ -2,10 +2,14 @@ package com.example.ecom.controller;
 
 import com.example.ecom.controller.exception.BadRequestException;
 import com.example.ecom.controller.exception.CustomerIdNotFoundException;
+import com.example.ecom.controller.exception.NullDTOException;
 import com.example.ecom.controller.exception.NullIdException;
+import com.example.ecom.dto.CustomerDto;
+import com.example.ecom.model.Area;
 import com.example.ecom.model.Customer;
 import com.example.ecom.model.Entity;
 import com.example.ecom.repository.CustomerRepository;
+import com.example.ecom.service.CustomerManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,6 +22,9 @@ public class CustomerController {
 
     @Autowired
     private CustomerRepository customerRepository;
+
+    @Autowired
+    private CustomerManager customerManager;
 
     @GetMapping
     public List<Customer> getAll() {
@@ -49,25 +56,28 @@ public class CustomerController {
     /**
      * {@code POST /customer/} create a new customer and save it to database
      *
-     * @param customer new customer with its information
+     * @param customerDto new customer with its information
      * @return return saved customer to confirm its creation
      */
-    @PostMapping()
-    public Customer create(@RequestBody Customer customer) {
-        return customerRepository.save(customer);
+    @PostMapping
+    public Customer create(@RequestBody CustomerDto customerDto) {
+        if(customerDto == null) {
+            throw new NullDTOException(Entity.CUSTOMER);
+        }
+        return customerManager.create(customerDto);
     }
 
     /**
      * {@code PUT /customer/:id} Update an existing customer by its id
      *
      * @param id id used to retrieve the customer to be updated
-     * @param newCustomer new product with updated values
+     * @param customerDto new product with updated values
      * @return return new customer to confirm update
      * @throws NullIdException when the given customer id is null
      * @throws CustomerIdNotFoundException when the given customer id does not exist
      */
     @PutMapping("{id}")
-    public Customer update(@PathVariable Long id, @RequestBody Customer newCustomer) {
+    public Customer update(@PathVariable Long id, @RequestBody CustomerDto customerDto) {
         // Null check for id
         if(id == null) {
             throw new NullIdException(Entity.CUSTOMER);
@@ -80,12 +90,8 @@ public class CustomerController {
 
         Customer customer = optionalCustomer.get();
 
-        customer.setFirstName(newCustomer.getFirstName());
-        customer.setLastName(newCustomer.getLastName());
-        customer.setDob(newCustomer.getDob());
-        customer.setArea(newCustomer.getArea());
+        return customerManager.update(customer,customerDto);
 
-        return customerRepository.save(customer);
     }
 
     /**

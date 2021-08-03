@@ -8,6 +8,7 @@ import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import javax.persistence.Entity;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -46,5 +47,5 @@ public class Area extends Auditable{
     // Customer
     @JsonManagedReference
     @OneToMany(mappedBy = "area", fetch = FetchType.LAZY)
-    private List<Customer> customers;
+    private List<Customer> customers = new ArrayList<>();
 }

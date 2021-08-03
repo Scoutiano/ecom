@@ -6,10 +6,6 @@ import org.zalando.problem.Status;
 import org.zalando.problem.StatusType;
 
 public class BadRequestException extends AbstractThrowableProblem {
-
-    /**
-     *
-     */
     private Entity entity;
     private String errorCode;
     public BadRequestException(String message, Entity entity, String errorCode) {

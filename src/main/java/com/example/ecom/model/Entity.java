@@ -4,5 +4,7 @@ public enum Entity {
     AREA,
     CITY,
     PRODUCT,
-    CUSTOMER
+    CUSTOMER,
+    ORDER,
+    ORDERDETAIL
 }

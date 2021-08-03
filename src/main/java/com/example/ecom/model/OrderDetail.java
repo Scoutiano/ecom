@@ -1,5 +1,6 @@
 package com.example.ecom.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
@@ -34,12 +35,14 @@ public class OrderDetail {
 
     // Order
     @NonNull
+    @JsonBackReference
     @JoinColumn(nullable = false)
     @ManyToOne
     private Order order;
 
     // Product
     @NonNull
+    @JsonBackReference
     @JoinColumn(nullable = false)
     @ManyToOne
     private Product product;

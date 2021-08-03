@@ -20,6 +20,7 @@ import java.util.List;
 @EqualsAndHashCode
 @ToString
 public class City extends Auditable{
+
     @Id
     @GeneratedValue
     private Long id;

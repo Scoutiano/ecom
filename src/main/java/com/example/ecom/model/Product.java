@@ -55,8 +55,9 @@ public class Product extends Auditable{
 
     // OrderDetail
     @NonNull
+    @JsonManagedReference
     @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
-    private List<OrderDetail> orderDetails;
+    private List<OrderDetail> orderDetails = new ArrayList<>();
     public void addOrderDetail(OrderDetail orderDetail) {
         orderDetails.add(orderDetail);
     }

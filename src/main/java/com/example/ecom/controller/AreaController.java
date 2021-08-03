@@ -82,6 +82,8 @@ public class AreaController {
 
         uniqueCityAreaCheck(area.getAreaName(),city);
 
+
+        // SERVICE
         area.setCity(city);
         areaRepository.save(area);
         city.addArea(area);
