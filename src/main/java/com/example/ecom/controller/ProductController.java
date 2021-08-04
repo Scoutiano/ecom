@@ -1,11 +1,13 @@
 package com.example.ecom.controller;
 
 import com.example.ecom.controller.exception.BadRequestException;
+import com.example.ecom.controller.exception.NullDTOException;
 import com.example.ecom.controller.exception.NullIdException;
 import com.example.ecom.controller.exception.ProductIdNotFoundException;
 import com.example.ecom.model.Entity;
 import com.example.ecom.model.Product;
 import com.example.ecom.repository.ProductRepository;
+import com.example.ecom.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,9 +21,12 @@ public class ProductController {
     @Autowired
     private ProductRepository productRepository;
 
+    @Autowired
+    private ProductService productService;
+
     @GetMapping
     public List<Product> getAll() {
-        return productRepository.findAll();
+        return productService.getALl();
     }
 
     /**
@@ -54,20 +59,23 @@ public class ProductController {
      */
     @PostMapping()
     public Product create(@RequestBody Product product) {
-        return productRepository.save(product);
+        if(product == null) {
+            throw new NullDTOException(Entity.PRODUCT);
+        }
+        return productService.create(product);
     }
 
     /**
      * {@code PUT /product/:id} Update an existing product by its id
      *
      * @param id id used to retrieve the product to be updated
-     * @param newProduct new product with updated values
+     * @param productDto data transfer object with product information (type Product)
      * @return return new product to confirm update
      * @throws NullIdException when the given product id is null
      * @throws ProductIdNotFoundException when the given product id does not exist
      */
     @PutMapping("{id}")
-    public Product update(@PathVariable Long id, @RequestBody Product newProduct) {
+    public Product update(@PathVariable Long id, @RequestBody Product productDto) {
         // Null check for id
         if(id == null) {
             throw new NullIdException(Entity.PRODUCT);
@@ -80,10 +88,7 @@ public class ProductController {
 
         Product product = optionalProduct.get();
 
-        product.setPrice(newProduct.getPrice());
-        product.setProductName(newProduct.getProductName());
-
-        return productRepository.save(product);
+        return productService.update(product, productDto);
     }
 
     /**
@@ -97,6 +102,6 @@ public class ProductController {
         if(id == null) {
             throw new NullIdException(Entity.PRODUCT);
         }
-        productRepository.deleteById(id);
+        productService.delete(id);
     }
 }

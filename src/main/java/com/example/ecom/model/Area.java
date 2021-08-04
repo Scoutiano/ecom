@@ -1,6 +1,7 @@
 package com.example.ecom.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
@@ -34,7 +35,6 @@ public class Area extends Auditable{
     private String areaName;
 
     @NonNull
-    @Basic(optional = false)
     private Boolean active = true;
 
     // City
@@ -48,4 +48,7 @@ public class Area extends Auditable{
     @JsonManagedReference
     @OneToMany(mappedBy = "area", fetch = FetchType.LAZY)
     private List<Customer> customers = new ArrayList<>();
+    public void addCustomer(Customer customer) {
+        customers.add(customer);
+    }
 }

@@ -1,15 +1,13 @@
 package com.example.ecom.controller;
 
-import com.example.ecom.controller.exception.BadRequestException;
 import com.example.ecom.controller.exception.CustomerIdNotFoundException;
 import com.example.ecom.controller.exception.NullDTOException;
 import com.example.ecom.controller.exception.NullIdException;
 import com.example.ecom.dto.CustomerDto;
-import com.example.ecom.model.Area;
 import com.example.ecom.model.Customer;
 import com.example.ecom.model.Entity;
 import com.example.ecom.repository.CustomerRepository;
-import com.example.ecom.service.CustomerManager;
+import com.example.ecom.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,11 +22,16 @@ public class CustomerController {
     private CustomerRepository customerRepository;
 
     @Autowired
-    private CustomerManager customerManager;
+    private CustomerService customerService;
 
+    /**
+     * {@code GET get a list of all customers}
+     *
+     * @return List of Customer objects
+     */
     @GetMapping
     public List<Customer> getAll() {
-        return customerRepository.findAll();
+        return customerService.getAll();
     }
 
     /**
@@ -64,7 +67,7 @@ public class CustomerController {
         if(customerDto == null) {
             throw new NullDTOException(Entity.CUSTOMER);
         }
-        return customerManager.create(customerDto);
+        return customerService.create(customerDto);
     }
 
     /**
@@ -90,7 +93,7 @@ public class CustomerController {
 
         Customer customer = optionalCustomer.get();
 
-        return customerManager.update(customer,customerDto);
+        return customerService.update(customer,customerDto);
 
     }
 
@@ -105,6 +108,6 @@ public class CustomerController {
         if(id == null) {
             throw new NullIdException(Entity.CUSTOMER);
         }
-        customerRepository.deleteById(id);
+        customerService.delete(id);
     }
 }

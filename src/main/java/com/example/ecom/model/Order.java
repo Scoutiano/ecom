@@ -1,6 +1,7 @@
 package com.example.ecom.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
@@ -28,7 +29,12 @@ public class Order extends Auditable{
 
     @NonNull
     @Basic(optional = false)
+    @JsonInclude()
+    @Transient
     private Float calculatedPrice;
+
+    @NonNull
+    private Boolean active = true;
 
     // Customer
     @NonNull
@@ -40,7 +46,7 @@ public class Order extends Auditable{
     // OrderDetail
     @NonNull
     @JsonManagedReference
-    @OneToMany(mappedBy = "order", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "order", fetch = FetchType.LAZY)
     private List<OrderDetail> orderDetails = new ArrayList<>();
     public void addOrderDetail(OrderDetail orderDetail) {
         orderDetails.add(orderDetail);

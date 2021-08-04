@@ -11,8 +11,6 @@ import javax.validation.Constraint;
 import java.util.Optional;
 
 @Entity
-@Where(clause="active=1")
-@SQLDelete(sql = "UPDATE order SET active = false WHERE id=?")
 @NoArgsConstructor
 @Setter
 @Getter

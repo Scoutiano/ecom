@@ -1,10 +1,13 @@
 package com.example.ecom.controller;
 
+import com.example.ecom.controller.exception.NullDTOException;
 import com.example.ecom.controller.exception.NullIdException;
 import com.example.ecom.controller.exception.OrderIdNotFoundException;
+import com.example.ecom.dto.OrderDto;
 import com.example.ecom.model.Entity;
 import com.example.ecom.model.Order;
 import com.example.ecom.repository.OrderRepository;
+import com.example.ecom.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,6 +20,9 @@ public class OrderController {
 
     @Autowired
     private OrderRepository orderRepository;
+
+    @Autowired
+    private OrderService orderService;
 
     /**
      * {@code GET /order/} Get all orders
@@ -55,12 +61,16 @@ public class OrderController {
     /**
      * {@code POST /order/} create a new order and save it to database
      *
-     * @param order new order with its information
+     * @param orderDto data transfer object for order information & customer id
      * @return return saved order to confirm its creation
      */
     @PostMapping
-    public Order create(@RequestBody Order order) {
-        return orderRepository.save(order);
+    public Order create(@RequestBody OrderDto orderDto) {
+        if(orderDto == null ) {
+            throw new NullDTOException(Entity.ORDER);
+        }
+
+        return orderService.create(orderDto);
     }
 
     /**
@@ -102,6 +112,6 @@ public class OrderController {
         if(id == null) {
             throw new NullIdException(Entity.ORDER);
         }
-        orderRepository.deleteById(id);
+        orderService.delete(id);
     }
 }

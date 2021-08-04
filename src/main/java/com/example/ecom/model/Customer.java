@@ -41,7 +41,6 @@ public class Customer extends Auditable{
     private Date dob;
 
     @NonNull
-    @Basic(optional = false)
     private Boolean active = true;
 
     // Area
@@ -52,9 +51,7 @@ public class Customer extends Auditable{
     private Area area;
 
     // Order
-    @NonNull
     @JsonManagedReference
-    @JsonIgnore
     @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY)
     private List<Order> orders = new ArrayList<>();
     public void addOrder(Order order){

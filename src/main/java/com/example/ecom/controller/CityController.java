@@ -8,6 +8,7 @@ import com.example.ecom.model.City;
 import com.example.ecom.model.Entity;
 import com.example.ecom.repository.AreaRepository;
 import com.example.ecom.repository.CityRepository;
+import com.example.ecom.service.CityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,10 +20,13 @@ import java.util.Optional;
 public class CityController {
 
     @Autowired
-    CityRepository cityRepository;
+    private CityRepository cityRepository;
 
     @Autowired
-    AreaRepository areaRepository;
+    private AreaRepository areaRepository;
+
+    @Autowired
+    private CityService cityService;
 
     /**
      * {@code GET /city/} Get a list of all cities
@@ -31,7 +35,7 @@ public class CityController {
      */
     @GetMapping("")
     public List<City> getAll(){
-        return cityRepository.findAll();
+        return cityService.getAll();
     }
 
     /**
@@ -65,20 +69,20 @@ public class CityController {
      */
     @PostMapping()
     public City create(@RequestBody City city) {
-        return cityRepository.save(city);
+        return cityService.create(city);
     }
 
     /**
      * {@code PUT /city/:id} update a given city through the provided id.
      *
      * @param id id used to find the city that's going to be updated.
-     * @param newCity modified City object with null id
+     * @param cityDto data transfer object containing city information
      * @return City object after it has been modified to confirm update.
      * @throws BadRequestException if the given id is null
      * @throws CityIdNotFoundException if a city with the given id has not been found.
      */
     @PutMapping("/{id}")
-    public City update(@PathVariable Long id, @RequestBody City newCity) throws BadRequestException {
+    public City update(@PathVariable Long id, @RequestBody City cityDto) throws BadRequestException {
 
         // null check for id
         if(id == null) {
@@ -91,9 +95,7 @@ public class CityController {
             throw new AreaIdNotFoundException();
         }
         City city = optionalCity.get();
-        city.setCityName(newCity.getCityName());
-
-        return cityRepository.save(city);
+        return cityService.update(city, cityDto);
     }
 
     /**
@@ -108,6 +110,6 @@ public class CityController {
             throw new NullIdException(Entity.CITY);
         }
 
-        cityRepository.deleteById(id);
+        cityService.delete(id);
     }
 }
