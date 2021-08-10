@@ -55,7 +55,7 @@ public class OrderController {
         }
 
         Order order = optionalOrder.get();
-        return order;
+        return orderService.get(order);
     }
 
     /**
@@ -77,13 +77,13 @@ public class OrderController {
      * {@code PUT /product/:id} Update an existing order by its id
      *
      * @param id id used to retrieve the order to be updated
-     * @param newOrder new order with updated values
+     * @param orderDto new order with updated values
      * @return return new order to confirm update
      * @throws NullIdException when the given order id is null
      * @throws OrderIdNotFoundException when the given order id does not exist
      */
     @PutMapping("/{id}")
-    public Order update(@PathVariable Long id, @RequestBody Order newOrder) {
+    public Order update(@PathVariable Long id, @RequestBody OrderDto orderDto) {
         // Null check for id
         if(id == null) {
             throw new NullIdException(Entity.ORDER);
@@ -95,10 +95,7 @@ public class OrderController {
         }
         Order order = optionalOrder.get();
 
-        order.setCalculatedPrice(newOrder.getCalculatedPrice());
-        order.setCustomer(newOrder.getCustomer());
-
-        return orderRepository.save(order);
+        return orderService.update(order,orderDto);
     }
 
     /**

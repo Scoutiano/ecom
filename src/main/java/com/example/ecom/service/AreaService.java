@@ -15,6 +15,7 @@ public class AreaService {
 
     @Autowired
     private AreaRepository areaRepository;
+    //de
 
     @Autowired
     private CityRepository cityRepository;
@@ -42,7 +43,6 @@ public class AreaService {
 
         area.setCity(city);
         area.setAreaName(areaDto.getAreaName());
-        areaRepository.save(area);
         city.addArea(area);
 
         return areaRepository.save(area);

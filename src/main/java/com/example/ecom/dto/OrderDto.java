@@ -6,6 +6,8 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
+import javax.persistence.GeneratedValue;
+
 @Setter
 @Getter
 @RequiredArgsConstructor

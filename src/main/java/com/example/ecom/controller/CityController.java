@@ -1,9 +1,6 @@
 package com.example.ecom.controller;
 
-import com.example.ecom.controller.exception.AreaIdNotFoundException;
-import com.example.ecom.controller.exception.BadRequestException;
-import com.example.ecom.controller.exception.CityIdNotFoundException;
-import com.example.ecom.controller.exception.NullIdException;
+import com.example.ecom.controller.exception.*;
 import com.example.ecom.model.City;
 import com.example.ecom.model.Entity;
 import com.example.ecom.repository.AreaRepository;
@@ -69,6 +66,9 @@ public class CityController {
      */
     @PostMapping()
     public City create(@RequestBody City city) {
+        if(city == null) {
+            throw new NullDTOException(Entity.CITY);
+        }
         return cityService.create(city);
     }
 

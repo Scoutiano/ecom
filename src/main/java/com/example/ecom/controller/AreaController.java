@@ -1,9 +1,6 @@
 package com.example.ecom.controller;
 
-import com.example.ecom.controller.exception.AreaIdNotFoundException;
-import com.example.ecom.controller.exception.BadRequestException;
-import com.example.ecom.controller.exception.CityIdNotFoundException;
-import com.example.ecom.controller.exception.NullIdException;
+import com.example.ecom.controller.exception.*;
 import com.example.ecom.dto.AreaDto;
 import com.example.ecom.model.Area;
 import com.example.ecom.model.City;
@@ -71,6 +68,10 @@ public class AreaController {
     @PostMapping()
     public Area create(@RequestBody AreaDto areaDto){
 
+        if(areaDto == null) {
+            throw new NullDTOException(Entity.AREA);
+        }
+
         // null check for id
         if(areaDto.getCity() == null) {
             throw new NullIdException(Entity.AREA);
@@ -93,7 +94,7 @@ public class AreaController {
     /**
      *{@code PUT /area/:id} Update an area through its id
      *
-     * @param id id used to retrieve an area
+     * @param id id used to retrieve original area
      * @param areaDto updated area with new values
      * @return return updated Area object to confirm update
      * @throws AreaIdNotFoundException when the requested area id is not found
