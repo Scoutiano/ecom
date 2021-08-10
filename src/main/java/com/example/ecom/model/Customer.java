@@ -9,46 +9,52 @@ import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import javax.persistence.Entity;
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 @Entity
 @Where(clause="active=1")
-@SQLDelete(sql = "UPDATE area SET active = false WHERE id=?")
+@SQLDelete(sql = "UPDATE customer SET active = false WHERE id=?")
 @NoArgsConstructor
 @Setter
 @Getter
 @RequiredArgsConstructor
 @EqualsAndHashCode
 @ToString
-@Table(uniqueConstraints={
-        @UniqueConstraint(name = "unq_city_area", columnNames = {"city_id", "areaName"})
-})
-public class Area extends Auditable{
+public class Customer extends Auditable{
     @Id
     @GeneratedValue
     private Long id;
 
     @NonNull
+    private String firstName;
+
+    @NonNull
     @Basic(optional = false)
-    private String areaName;
+    private String lastName;
+
+    @NonNull
+    @Basic(optional = false)
+    @Temporal(TemporalType.DATE)
+    private Date dob;
 
     @NonNull
     private Boolean active = true;
 
-    // City
+    // Area
     @NonNull
+    @JoinColumn(nullable = false)
     @JsonBackReference
     @ManyToOne
-    @JoinColumn(nullable = false)
-    private City city;
+    private Area area;
 
-    // Customer
+    // Order
     @JsonManagedReference
-    @OneToMany(mappedBy = "area", fetch = FetchType.LAZY)
-    private List<Customer> customers = new ArrayList<>();
-    public void addCustomer(Customer customer) {
-        customers.add(customer);
+    @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY)
+    private List<Order> orders = new ArrayList<>();
+    public void addOrder(Order order){
+        orders.add(order);
     }
 }

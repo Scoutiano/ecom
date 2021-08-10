@@ -1,7 +1,7 @@
 package com.example.ecom.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
@@ -11,44 +11,44 @@ import javax.persistence.*;
 import javax.persistence.Entity;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
-@Entity
+@Entity(name = "`order`")
 @Where(clause="active=1")
-@SQLDelete(sql = "UPDATE area SET active = false WHERE id=?")
+@SQLDelete(sql = "UPDATE `order` SET active = false WHERE id=?")
 @NoArgsConstructor
 @Setter
 @Getter
 @RequiredArgsConstructor
 @EqualsAndHashCode
 @ToString
-@Table(uniqueConstraints={
-        @UniqueConstraint(name = "unq_city_area", columnNames = {"city_id", "areaName"})
-})
-public class Area extends Auditable{
+public class Order extends Auditable{
+
     @Id
     @GeneratedValue
     private Long id;
 
     @NonNull
     @Basic(optional = false)
-    private String areaName;
+    @JsonInclude()
+    @Transient
+    private Float calculatedPrice;
 
     @NonNull
     private Boolean active = true;
 
-    // City
-    @NonNull
-    @JsonBackReference
-    @ManyToOne
-    @JoinColumn(nullable = false)
-    private City city;
-
     // Customer
+    @NonNull
+    @ManyToOne
+    @JsonBackReference
+    @JoinColumn(nullable = false)
+    private Customer customer;
+
+    // OrderDetail
+    @NonNull
     @JsonManagedReference
-    @OneToMany(mappedBy = "area", fetch = FetchType.LAZY)
-    private List<Customer> customers = new ArrayList<>();
-    public void addCustomer(Customer customer) {
-        customers.add(customer);
+    @OneToMany(mappedBy = "order", fetch = FetchType.LAZY)
+    private List<OrderDetail> orderDetails = new ArrayList<>();
+    public void addOrderDetail(OrderDetail orderDetail) {
+        orderDetails.add(orderDetail);
     }
 }

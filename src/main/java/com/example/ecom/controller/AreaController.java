@@ -1,14 +1,14 @@
 package com.example.ecom.controller;
 
-import com.example.ecom.controller.exception.AreaIdNotFoundException;
-import com.example.ecom.controller.exception.BadRequestException;
-import com.example.ecom.controller.exception.CityIdNotFoundException;
-import com.example.ecom.controller.exception.NullIdException;
+import com.example.ecom.controller.exception.*;
+import com.example.ecom.dto.AreaDto;
 import com.example.ecom.model.Area;
 import com.example.ecom.model.City;
 import com.example.ecom.model.Entity;
 import com.example.ecom.repository.AreaRepository;
 import com.example.ecom.repository.CityRepository;
+import com.example.ecom.service.AreaService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,29 +18,22 @@ import java.util.Optional;
 @RequestMapping("/area")
 public class AreaController {
 
+    @Autowired
+    private AreaRepository areaRepository;
+    @Autowired
+    private CityRepository cityRepository;
 
-    AreaRepository areaRepository;
-    CityRepository cityRepository;
-
-    /**
-     * Constructor for AreaController class
-     *
-     * @param cityRepository used to perform queries related to City entity
-     * @param areaRepository used to perform queries related to Area entity
-     */
-    public AreaController(AreaRepository areaRepository, CityRepository cityRepository){
-        this.areaRepository = areaRepository;
-        this.cityRepository = cityRepository;
-    }
+    @Autowired
+    private AreaService areaService;
 
     /**
      * {@code GET /area/} Get all areas information with their cities
      *
      * @return list of cities containing all areas
      */
-    @GetMapping("")
+    @GetMapping()
     public List<City> getAll() {
-        return cityRepository.findAll();
+        return areaService.getAll();
     }
 
     /**
@@ -53,7 +46,10 @@ public class AreaController {
     @GetMapping("/{id}")
     public Area get(@PathVariable Long id) {
 
-        nullIdCheck(id,Entity.AREA);
+        // null check for id
+        if(id == null) {
+            throw new NullIdException(Entity.AREA);
+        }
 
         Optional<Area> optionalArea = areaRepository.findById(id);
         if(!optionalArea.isPresent()) {
@@ -63,72 +59,53 @@ public class AreaController {
     }
 
     /**
-     * {@code POST /area/:id} Create a new area within a selected city
+     * {@code POST /area/} Create a new area within a selected city
      *
-     * @param id id of city for area to be created in
-     * @param area area to be added
+     * @param areaDto data transfer object for area information & city id
      * @return return the created area to confirm its creation
      * @throws CityIdNotFoundException when the requested city id is not found
      */
-    @PostMapping("/{id}")
-    public Area create(@PathVariable Long id, @RequestBody Area area){
+    @PostMapping()
+    public Area create(@RequestBody AreaDto areaDto){
 
-        nullIdCheck(id,Entity.CITY);
-        areaNullCheck(area);
+        if(areaDto == null) {
+            throw new NullDTOException(Entity.AREA);
+        }
+
+        // null check for id
+        if(areaDto.getCity() == null) {
+            throw new NullIdException(Entity.AREA);
+        }
 
         // Check if city with given id exists
-        Optional<City> optionalCity = cityRepository.findById(id);
+        Optional<City> optionalCity = cityRepository.findById(areaDto.getCity());
         if(!optionalCity.isPresent()) {
             throw new CityIdNotFoundException();
         }
 
         City city = optionalCity.get();
 
-        uniqueCityAreaCheck(area.getAreaName(),city);
+        uniqueCityAreaCheck(areaDto.getAreaName(),city);
 
-        area.setCity(city);
-        areaRepository.save(area);
-        city.addArea(area);
 
-        return area;
-    }
-
-    /**
-     * {@code DELETE /area/:id} Delete an area a given id
-     *
-     * @param id the area with this given id is to be deleted
-     * @throws AreaIdNotFoundException when the requested area id is not found
-     */
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
-        nullIdCheck(id,Entity.AREA);
-
-        // Check if area with given id exists *REVIEW
-        Optional<Area> optionalArea = areaRepository.findById(id);
-
-        if(!optionalArea.isPresent()){
-            throw new AreaIdNotFoundException();
-        }
-
-        Area area = optionalArea.get();
-        area.setActive(false);
-
-        areaRepository.save(area);
+        return areaService.create(areaDto);
     }
 
     /**
      *{@code PUT /area/:id} Update an area through its id
      *
-     * @param id id used to retrieve an area
-     * @param newArea updated area with new values
+     * @param id id used to retrieve original area
+     * @param areaDto updated area with new values
      * @return return updated Area object to confirm update
      * @throws AreaIdNotFoundException when the requested area id is not found
      */
     @PutMapping("/{id}")
-    public Area update(@PathVariable Long id, @RequestBody Area newArea){
+    public Area update(@PathVariable Long id, @RequestBody AreaDto areaDto){
 
-        nullIdCheck(id, Entity.AREA);
-        areaNullCheck(newArea);
+        // null check for id
+        if(id == null) {
+            throw new NullIdException(Entity.AREA);
+        }
 
         Optional<Area> optionalArea = areaRepository.findById(id);
 
@@ -138,38 +115,23 @@ public class AreaController {
 
         Area area = optionalArea.get();
 
-        area.setAreaName(newArea.getAreaName());
-        area.setCity(newArea.getCity());
-        return areaRepository.save(area);
+        return areaService.update(area,areaDto);
     }
 
     /**
-     * Utility method to check if given id is null
+     * {@code DELETE /area/:id} Delete an area a given id
      *
-     * @param id given entity id to check
-     * @param entity entity name to use in exception
-     * @throws NullIdException when given id is null
+     * @param id the area with this given id is to be deleted (Set active to false)
+     * @throws AreaIdNotFoundException when the requested area id is not found
      */
-    public void nullIdCheck(Long id, Entity entity){
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
+        // null check for id
         if(id == null) {
-            throw new NullIdException(entity);
-        }
-    }
-
-    /**
-     * Utility method used to check if area or any of its passed variables are null
-     *
-     * @param area area to be checked for null variables
-     * @throws BadRequestException if area or area.getAreaName() are null
-     */
-    public void areaNullCheck(Area area) {
-        if(area == null) {
-            throw new BadRequestException("Area is null",Entity.AREA,"area_null");
+            throw new NullIdException(Entity.AREA);
         }
 
-        if(area.getAreaName() == null) {
-            throw new BadRequestException("Area name is null",Entity.AREA,"areaName_null");
-        }
+        areaService.delete(id);
     }
 
     /**
