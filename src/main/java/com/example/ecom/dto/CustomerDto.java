@@ -13,6 +13,8 @@ import java.util.Date;
 @RequiredArgsConstructor
 public class CustomerDto {
 
+    private Long id;
+
     @NonNull
     private String firstName;
     @NonNull

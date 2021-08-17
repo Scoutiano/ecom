@@ -53,6 +53,7 @@ public class Customer extends Auditable{
     // Order
     @JsonManagedReference
     @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY)
+    @ToString.Exclude
     private List<Order> orders = new ArrayList<>();
     public void addOrder(Order order){
         orders.add(order);

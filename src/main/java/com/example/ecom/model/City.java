@@ -36,6 +36,7 @@ public class City extends Auditable{
     // Area
     @JsonManagedReference
     @OneToMany(mappedBy = "city", fetch = FetchType.LAZY)
+    @ToString.Exclude
     private List<Area> areas = new ArrayList<>();
     public void addArea(Area area){
         areas.add(area);

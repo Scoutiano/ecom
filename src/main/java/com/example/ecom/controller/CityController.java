@@ -1,6 +1,7 @@
 package com.example.ecom.controller;
 
 import com.example.ecom.controller.exception.*;
+import com.example.ecom.dto.CityDto;
 import com.example.ecom.model.City;
 import com.example.ecom.model.Entity;
 import com.example.ecom.repository.AreaRepository;
@@ -50,52 +51,40 @@ public class CityController {
             throw new NullIdException(Entity.CITY);
         }
 
-        // Check if city with given id exists
-        Optional<City> optionalCity = cityRepository.findById(id);
-        if(!optionalCity.isPresent()) {
-            throw new CityIdNotFoundException();
-        }
-        return optionalCity.get();
+        return cityService.get(id);
     }
 
     /**
      * {@code POST /city/} Create a new city
      *
-     * @param city City object to be added
+     * @param cityDto Data transfer object containing city information to be added
      * @return return created City object to confirm its creation
      */
-    @PostMapping()
-    public City create(@RequestBody City city) {
-        if(city == null) {
+    @PostMapping
+    public City create(@RequestBody CityDto cityDto) {
+        if(cityDto == null) {
             throw new NullDTOException(Entity.CITY);
         }
-        return cityService.create(city);
+        return cityService.create(cityDto);
     }
 
     /**
      * {@code PUT /city/:id} update a given city through the provided id.
      *
-     * @param id id used to find the city that's going to be updated.
      * @param cityDto data transfer object containing city information
      * @return City object after it has been modified to confirm update.
      * @throws BadRequestException if the given id is null
      * @throws CityIdNotFoundException if a city with the given id has not been found.
      */
-    @PutMapping("/{id}")
-    public City update(@PathVariable Long id, @RequestBody City cityDto) throws BadRequestException {
+    @PutMapping
+    public City update(@RequestBody CityDto cityDto) throws BadRequestException {
 
         // null check for id
-        if(id == null) {
-            throw new NullIdException(Entity.CITY);
+        if(cityDto == null) {
+            throw new NullDTOException(Entity.CITY);
         }
 
-        Optional<City> optionalCity = cityRepository.findById(id);
-
-        if(!optionalCity.isPresent()) {
-            throw new AreaIdNotFoundException();
-        }
-        City city = optionalCity.get();
-        return cityService.update(city, cityDto);
+        return cityService.update(cityDto);
     }
 
     /**

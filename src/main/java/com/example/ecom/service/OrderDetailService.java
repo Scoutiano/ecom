@@ -27,6 +27,9 @@ public class OrderDetailService {
     @Autowired
     private ProductRepository productRepository;
 
+    @Autowired
+    private ProductService productService;
+
     /**
      * Create a set of orderdetails for a given order
      *
@@ -40,22 +43,25 @@ public class OrderDetailService {
                 throw new ProductIdNotFoundException();
             }
             Product product = optionalProduct.get();
-            Float price = new Float(product.getPrice());
 
-            OrderDetail orderDetail = new OrderDetail();
+            quantityCheck(product,orderDetailDtos[i]);
 
-            orderDetail.setOrder(order);
-            orderDetail.setCalculatedPrice(orderDetailDtos[i].getQuantity() * price);
-            orderDetail.setProduct(optionalProduct.get());
-            orderDetail.setQuantity(orderDetailDtos[i].getQuantity());
-
-            quantityCheck(product,orderDetail);
-
-            product.setQuantity(product.getQuantity() - orderDetail.getQuantity());
+            OrderDetail orderDetail = dtoToOrderDetail(order,product,orderDetailDtos[i]);
 
             orderDetailRepository.save(orderDetail);
-            productRepository.save(product);
+
+            productService.updateProductQuantity(product,orderDetail.getQuantity());
         }
+    }
+
+    public OrderDetail dtoToOrderDetail(Order order, Product product,OrderDetailDto orderDetailDto) {
+        OrderDetail orderDetail = new OrderDetail();
+        orderDetail.setOrder(order);
+        orderDetail.setCalculatedPrice(orderDetailDto.getQuantity() * product.getPrice());
+        orderDetail.setProduct(product);
+        orderDetail.setQuantity(orderDetailDto.getQuantity());
+
+        return orderDetail;
     }
 
     /**
@@ -71,15 +77,10 @@ public class OrderDetailService {
                 throw new ProductIdNotFoundException();
             }
             Product product = optionalProduct.get();
-            Float price = new Float(product.getPrice());
 
-            OrderDetail orderDetail = new OrderDetail();
+            quantityCheck(product,orderDetailDtos[i]);
 
-            orderDetail.setOrder(order);
-            orderDetail.setCalculatedPrice(orderDetailDtos[i].getQuantity() * price);
-            orderDetail.setProduct(optionalProduct.get());
-            orderDetail.setQuantity(orderDetailDtos[i].getQuantity());
-            orderDetail.setId(orderDetailDtos[i].getId());
+            OrderDetail orderDetail = dtoToOrderDetail(order,product,orderDetailDtos[i]);
 
             Optional<OrderDetail> optionalOrderDetail = orderDetailRepository.findById(orderDetail.getId());
             if(!optionalOrderDetail.isPresent()) {
@@ -89,11 +90,10 @@ public class OrderDetailService {
 
 
             product.setQuantity(product.getQuantity() + oldOrderDetail.getQuantity());
-            quantityCheck(product,orderDetail);
-
-            product.setQuantity(product.getQuantity() - orderDetail.getQuantity());
 
             orderDetailRepository.save(orderDetail);
+
+            productService.updateProductQuantity(product,orderDetail.getQuantity());
         }
     }
 
@@ -125,20 +125,20 @@ public class OrderDetailService {
      * Utility method used for quantity validation
      *
      * @param product product for containing max per customer, min per customer to be compared & quantity to be updated as well
-     * @param orderDetail orderDetail to validate
+     * @param orderDetailDto order detail to for quantity validation
      */
-    public void quantityCheck(Product product, OrderDetail orderDetail){
-        Integer quantity = new Integer(orderDetail.getQuantity());
-        if(quantity < product.getMinPerCustomer()){
-            throw new BadRequestException("Order quantity is less than the minimum for product id " + product.getId(), Entity.ORDERDETAIL, "min_per_customer");
+    public void quantityCheck(Product product, OrderDetailDto orderDetailDto){
+
+        if(orderDetailDto.getQuantity() < product.getMinPerCustomer()){
+            throw new BadRequestException("Order quantity is less than the minimum for product id " + product.getProductName(), Entity.ORDERDETAIL, "min_per_customer");
         }
 
-        if(quantity > product.getMaxPerCustomer()){
-            throw new BadRequestException("Order quantity is more than the maximum for product id " + product.getId(), Entity.ORDERDETAIL, "max_per_customer");
+        if(orderDetailDto.getQuantity() > product.getMaxPerCustomer()){
+            throw new BadRequestException("Order quantity is more than the maximum for product id " + product.getProductName(), Entity.ORDERDETAIL, "max_per_customer");
         }
 
-        if(quantity > product.getQuantity()) {
-            throw new BadRequestException("The quantity of the product id " + product.getId() + " is not enough for this order", Entity.ORDERDETAIL, "order_too_big");
+        if(orderDetailDto.getQuantity() > product.getQuantity()) {
+            throw new BadRequestException("The quantity of the product id " + product.getProductName() + " is not enough for this order", Entity.ORDERDETAIL, "order_too_big");
         }
     }
 }

@@ -10,6 +10,8 @@ import lombok.Setter;
 @RequiredArgsConstructor
 public class AreaDto {
 
+    private Long id;
+
     @NonNull
     private String areaName;
 

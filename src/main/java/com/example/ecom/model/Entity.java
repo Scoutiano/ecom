@@ -6,5 +6,6 @@ public enum Entity {
     PRODUCT,
     CUSTOMER,
     ORDER,
-    ORDERDETAIL
+    ORDERDETAIL,
+    ATTRIBUTE
 }

@@ -51,11 +51,7 @@ public class AreaController {
             throw new NullIdException(Entity.AREA);
         }
 
-        Optional<Area> optionalArea = areaRepository.findById(id);
-        if(!optionalArea.isPresent()) {
-            throw new AreaIdNotFoundException();
-        }
-        return optionalArea.get();
+        return areaService.get(id);
     }
 
     /**
@@ -72,50 +68,25 @@ public class AreaController {
             throw new NullDTOException(Entity.AREA);
         }
 
-        // null check for id
-        if(areaDto.getCity() == null) {
-            throw new NullIdException(Entity.AREA);
-        }
-
-        // Check if city with given id exists
-        Optional<City> optionalCity = cityRepository.findById(areaDto.getCity());
-        if(!optionalCity.isPresent()) {
-            throw new CityIdNotFoundException();
-        }
-
-        City city = optionalCity.get();
-
-        uniqueCityAreaCheck(areaDto.getAreaName(),city);
-
-
         return areaService.create(areaDto);
     }
 
     /**
      *{@code PUT /area/:id} Update an area through its id
      *
-     * @param id id used to retrieve original area
      * @param areaDto updated area with new values
      * @return return updated Area object to confirm update
      * @throws AreaIdNotFoundException when the requested area id is not found
      */
-    @PutMapping("/{id}")
-    public Area update(@PathVariable Long id, @RequestBody AreaDto areaDto){
+    @PutMapping
+    public Area update(@RequestBody AreaDto areaDto){
 
         // null check for id
-        if(id == null) {
-            throw new NullIdException(Entity.AREA);
+        if(areaDto == null) {
+            throw new NullDTOException(Entity.AREA);
         }
 
-        Optional<Area> optionalArea = areaRepository.findById(id);
-
-        if(!optionalArea.isPresent()) {
-            throw new AreaIdNotFoundException();
-        }
-
-        Area area = optionalArea.get();
-
-        return areaService.update(area,areaDto);
+        return areaService.update(areaDto);
     }
 
     /**
@@ -132,19 +103,5 @@ public class AreaController {
         }
 
         areaService.delete(id);
-    }
-
-    /**
-     * Utility method to check for a violation in unq_city_area constraint
-     *
-     * @param areaName name of area, along side city must be unique
-     * @param city along side name of area must be unique
-     * @throws BadRequestException when there exists a previous record with the same city and area name
-     */
-    public void uniqueCityAreaCheck(String areaName, City city){
-        int count = areaRepository.findConflictingAreas(areaName,city);
-        if(count != 0) {
-            throw new BadRequestException("There already exists an area with the given name within this city",Entity.AREA,"area_duplicate");
-        }
     }
 }

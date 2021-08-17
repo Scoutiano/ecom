@@ -47,6 +47,7 @@ public class Order extends Auditable{
     @NonNull
     @JsonManagedReference
     @OneToMany(mappedBy = "order", fetch = FetchType.LAZY)
+    @ToString.Exclude
     private List<OrderDetail> orderDetails = new ArrayList<>();
     public void addOrderDetail(OrderDetail orderDetail) {
         orderDetails.add(orderDetail);

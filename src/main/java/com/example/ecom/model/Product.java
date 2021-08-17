@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
+import org.springframework.context.annotation.Scope;
 
 import javax.persistence.*;
 import javax.persistence.Entity;
@@ -18,14 +19,14 @@ import java.util.List;
 @Getter
 @RequiredArgsConstructor
 @EqualsAndHashCode
-@ToString
+//@ToString
 public class Product extends Auditable{
 
     @Id
     @GeneratedValue
     private Long id;
-
     @NonNull
+
     @Basic(optional = false)
     private String productName;
 
@@ -56,9 +57,20 @@ public class Product extends Auditable{
     // OrderDetail
     @NonNull
     @JsonManagedReference
+    @ToString.Exclude
     @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
     private List<OrderDetail> orderDetails = new ArrayList<>();
     public void addOrderDetail(OrderDetail orderDetail) {
         orderDetails.add(orderDetail);
+    }
+
+    // Attribute
+    @NonNull
+    @JsonManagedReference
+    @ToString.Exclude
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
+    private List<Attribute> attributes = new ArrayList<>();
+    public void addAtrribute(Attribute attribute) {
+        attributes.add(attribute);
     }
 }

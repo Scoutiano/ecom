@@ -3,7 +3,9 @@ package com.example.ecom.controller;
 import com.example.ecom.controller.exception.NullDTOException;
 import com.example.ecom.controller.exception.NullIdException;
 import com.example.ecom.controller.exception.OrderIdNotFoundException;
+import com.example.ecom.dto.CustomerOrderReport;
 import com.example.ecom.dto.OrderDto;
+import com.example.ecom.model.Customer;
 import com.example.ecom.model.Entity;
 import com.example.ecom.model.Order;
 import com.example.ecom.repository.OrderRepository;
@@ -12,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -49,13 +52,7 @@ public class OrderController {
             throw new NullIdException(Entity.ORDER);
         }
 
-        Optional<Order> optionalOrder = orderRepository.findById(id);
-        if(!optionalOrder.isPresent()){
-            throw new OrderIdNotFoundException();
-        }
-
-        Order order = optionalOrder.get();
-        return orderService.get(order);
+        return orderService.get(id);
     }
 
     /**
@@ -76,26 +73,19 @@ public class OrderController {
     /**
      * {@code PUT /product/:id} Update an existing order by its id
      *
-     * @param id id used to retrieve the order to be updated
      * @param orderDto new order with updated values
      * @return return new order to confirm update
      * @throws NullIdException when the given order id is null
      * @throws OrderIdNotFoundException when the given order id does not exist
      */
-    @PutMapping("/{id}")
-    public Order update(@PathVariable Long id, @RequestBody OrderDto orderDto) {
+    @PutMapping
+    public Order update(@RequestBody OrderDto orderDto) {
         // Null check for id
-        if(id == null) {
-            throw new NullIdException(Entity.ORDER);
+        if(orderDto == null) {
+            throw new NullDTOException(Entity.ORDER);
         }
 
-        Optional<Order> optionalOrder = orderRepository.findById(id);
-        if(!optionalOrder.isPresent()){
-            throw new OrderIdNotFoundException();
-        }
-        Order order = optionalOrder.get();
-
-        return orderService.update(order,orderDto);
+        return orderService.update(orderDto);
     }
 
     /**
@@ -110,5 +100,10 @@ public class OrderController {
             throw new NullIdException(Entity.ORDER);
         }
         orderService.delete(id);
+    }
+
+    @GetMapping("/customers")
+    public Map<Long, CustomerOrderReport> getCustomersOrders() {
+        return orderService.getCustomersOrders();
     }
 }

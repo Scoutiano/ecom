@@ -6,12 +6,14 @@ import com.example.ecom.controller.exception.NullIdException;
 import com.example.ecom.dto.CustomerDto;
 import com.example.ecom.model.Customer;
 import com.example.ecom.model.Entity;
+import com.example.ecom.model.Order;
 import com.example.ecom.repository.CustomerRepository;
 import com.example.ecom.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -48,12 +50,7 @@ public class CustomerController {
             throw new NullIdException(Entity.CUSTOMER);
         }
 
-        Optional<Customer> optionalCustomer = customerRepository.findById(id);
-        if(!optionalCustomer.isPresent()) {
-            throw new CustomerIdNotFoundException();
-        }
-
-        return optionalCustomer.get();
+        return customerService.get(id);
     }
 
     /**
@@ -73,27 +70,19 @@ public class CustomerController {
     /**
      * {@code PUT /customer/:id} Update an existing customer by its id
      *
-     * @param id id used to retrieve the customer to be updated
      * @param customerDto new product with updated values
      * @return return new customer to confirm update
      * @throws NullIdException when the given customer id is null
      * @throws CustomerIdNotFoundException when the given customer id does not exist
      */
-    @PutMapping("{id}")
-    public Customer update(@PathVariable Long id, @RequestBody CustomerDto customerDto) {
+    @PutMapping
+    public Customer update(@RequestBody CustomerDto customerDto) {
         // Null check for id
-        if(id == null) {
-            throw new NullIdException(Entity.CUSTOMER);
+        if(customerDto == null) {
+            throw new NullDTOException(Entity.CUSTOMER);
         }
 
-        Optional<Customer> optionalCustomer = customerRepository.findById(id);
-        if(!optionalCustomer.isPresent()){
-            throw new CustomerIdNotFoundException();
-        }
-
-        Customer customer = optionalCustomer.get();
-
-        return customerService.update(customer,customerDto);
+        return customerService.update(customerDto);
 
     }
 

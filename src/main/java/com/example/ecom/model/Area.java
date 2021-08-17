@@ -37,16 +37,17 @@ public class Area extends Auditable{
     @NonNull
     private Boolean active = true;
 
-    // City
+    //City
     @NonNull
     @JsonBackReference
     @ManyToOne
     @JoinColumn(nullable = false)
     private City city;
 
-    // Customer
+    //Customer
     @JsonManagedReference
     @OneToMany(mappedBy = "area", fetch = FetchType.LAZY)
+    @ToString.Exclude
     private List<Customer> customers = new ArrayList<>();
     public void addCustomer(Customer customer) {
         customers.add(customer);
