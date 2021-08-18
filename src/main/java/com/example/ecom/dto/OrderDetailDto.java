@@ -13,7 +13,6 @@ import javax.validation.constraints.NotBlank;
 @RequiredArgsConstructor
 public class OrderDetailDto {
 
-    @NotBlank
     private Long id;
 
     @NonNull

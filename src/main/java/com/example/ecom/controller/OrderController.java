@@ -5,6 +5,7 @@ import com.example.ecom.controller.exception.NullIdException;
 import com.example.ecom.controller.exception.OrderIdNotFoundException;
 import com.example.ecom.dto.CustomerOrderReport;
 import com.example.ecom.dto.OrderDto;
+import com.example.ecom.dto.SingleOrderReport;
 import com.example.ecom.model.Customer;
 import com.example.ecom.model.Entity;
 import com.example.ecom.model.Order;
@@ -46,7 +47,7 @@ public class OrderController {
      * @throws OrderIdNotFoundException when the given order id does not exist
      */
     @GetMapping("/{id}")
-    public Order get(@PathVariable Long id) {
+    public SingleOrderReport get(@PathVariable Long id) {
         // Null check for id
         if(id == null) {
             throw new NullIdException(Entity.ORDER);

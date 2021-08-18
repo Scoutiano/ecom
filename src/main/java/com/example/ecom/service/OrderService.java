@@ -1,13 +1,13 @@
 package com.example.ecom.service;
 
 import com.example.ecom.controller.exception.OrderIdNotFoundException;
-import com.example.ecom.dto.CustomerOrderReport;
-import com.example.ecom.dto.OrderDto;
-import com.example.ecom.dto.OrderReportQuery;
+import com.example.ecom.dto.*;
 import com.example.ecom.model.Customer;
 import com.example.ecom.model.Order;
 import com.example.ecom.model.OrderDetail;
 import com.example.ecom.repository.OrderRepository;
+import com.sun.xml.bind.v2.runtime.unmarshaller.XsiNilLoader;
+import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
@@ -32,7 +32,7 @@ public class OrderService {
      * @param id order id to have its price calculated
      * @return return requested order with its calculatedPrice
      */
-    public Order get(Long id){
+    public SingleOrderReport get(Long id){
         Optional<Order> optionalOrder = orderRepository.findById(id);
         if(!optionalOrder.isPresent()){
             throw new OrderIdNotFoundException();
@@ -40,7 +40,37 @@ public class OrderService {
         Order order = optionalOrder.get();
 
         order.setCalculatedPrice(calculatePrice(order.getId()));
-        return order;
+
+        return orderToSingleOrderReport(order);
+    }
+
+    private SingleOrderReport orderToSingleOrderReport(Order order) {
+        SingleOrderReport singleOrderReport = new SingleOrderReport();
+        singleOrderReport.setActive(order.getActive());
+        singleOrderReport.setId(order.getId());
+        singleOrderReport.setLastModifiedDate(order.getLastModifiedDate());
+        singleOrderReport.setCreationDate(order.getCreationDate());
+        singleOrderReport.setCalculatedPrice(order.getCalculatedPrice());
+
+        for(OrderDetail orderDetail:order.getOrderDetails()) {
+            OrderProductDetail orderProductDetail = orderDetailToOrderProductDetail(orderDetail, singleOrderReport);
+            singleOrderReport.addOrderProductDetail(orderProductDetail);
+        }
+
+        return singleOrderReport;
+    }
+
+    private OrderProductDetail orderDetailToOrderProductDetail(OrderDetail orderDetail, SingleOrderReport singleOrderReport) {
+        OrderProductDetail orderProductDetail = new OrderProductDetail();
+        orderProductDetail.setOrderId(singleOrderReport.getId());
+        orderProductDetail.setProductId(orderDetail.getProduct().getId());
+        orderProductDetail.setProductPrice(orderDetail.getProduct().getPrice());
+        orderProductDetail.setProductName(orderDetail.getProduct().getProductName());
+        orderProductDetail.setCalculatedPrice(orderDetail.getCalculatedPrice());
+        orderProductDetail.setQuantity(orderDetail.getQuantity());
+        orderProductDetail.setId(orderDetail.getId());
+
+        return orderProductDetail;
     }
 
     /**
